@@ -1,0 +1,25 @@
+split:
+  test_size:    0.2
+  random_state: 42
+
+model:
+  name:          lightgbm
+  n_estimators:  100
+  max_depth:     6
+  num_leaves:    63
+  learning_rate: 0.1
+  metric:        binary_logloss
+  random_state:  42
+
+artifacts:
+  model:    Model/artifacts/lgbm_balanced_model.joblib
+  features: Model/artifacts/features.joblib
+  medianas: Model/artifacts/medianas.joblib
+
+minio:
+  bucket:  model-artifacts
+  version: v2
+  objects:
+    model:    lgbm_balanced_model.joblib
+    features: features.joblib
+    medianas: medianas.joblib

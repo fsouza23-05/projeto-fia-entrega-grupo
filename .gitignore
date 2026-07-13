@@ -1,0 +1,24 @@
+# Virtual Environments
+creditguard-env/
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model Artifacts (exceto os versionados em Model/artifacts/)
+*.pkl
+*.joblib
+!Model/artifacts/*.joblib
+
+# VS Code
+.vscode/
+
+# Data
+Dados/raw/*.csv
+Dados/abt_full.csv
