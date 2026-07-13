@@ -73,12 +73,7 @@ proscore-creditguard-ai/
 │       ├── lgbm_balanced_model.joblib
 │       ├── features.joblib
 │       └── medianas.joblib
-├── app/
-│   ├── app.py                      ← interface Streamlit
-│   ├── Dockerfile
-│   └── requirements.txt
-├── docker-compose.yml
-└── requirements.txt
+
 ```
 
 ---
