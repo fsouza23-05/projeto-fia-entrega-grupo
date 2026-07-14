@@ -238,3 +238,68 @@ docker exec -it creditguard-postgres psql -U creditguard -d creditguard \
 | `MINIO_ENDPOINT` | `minio:9000` | Endereço do MinIO (interno ao Docker) |
 | `POSTGRES_HOST` | `postgres` | Host do banco de dados |
 | `OMP_NUM_THREADS` | `1` | Limita threads OpenMP — garante estabilidade do LightGBM em container |
+
+---
+
+## Entrega Individual (MLOps)
+
+Esta etapa individual está organizada em dois novos diretórios:
+
+- `MLOps/`: arquitetura, docker-compose, monitoramento e orquestração
+- `app/`: API de predição (FastAPI)
+
+### Estrutura adicionada
+
+```text
+MLOps/
+├── README.md
+├── docker-compose.yml
+├── pipeline_orchestration.py
+└── monitoring/
+    └── prometheus.yml
+
+app/
+├── Dockerfile
+├── main.py
+└── requirements.txt
+```
+
+### Subindo o serviço de predição + monitoramento
+
+```bash
+docker compose -f MLOps/docker-compose.yml up --build -d
+```
+
+Endpoints principais:
+
+- API: `http://localhost:8000`
+- Swagger: `http://localhost:8000/docs`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000` (admin/admin)
+
+### Teste rápido de predição
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amt_income_total": 150000,
+    "amt_credit": 300000,
+    "amt_annuity": 25000,
+    "down_payment": 50000,
+    "age_years": 35,
+    "years_employed": 5,
+    "cnt_children": 0,
+    "ext_source_1": 0.50,
+    "ext_source_2": 0.50,
+    "ext_source_3": 0.50
+  }'
+```
+
+### Executando o pipeline batch de dados + treino
+
+```bash
+docker compose -f MLOps/docker-compose.yml --profile batch up --build pipeline-orchestrator
+```
+
+Detalhamento da arquitetura e próximos passos de monitoramento/automação estão em `MLOps/README.md`.

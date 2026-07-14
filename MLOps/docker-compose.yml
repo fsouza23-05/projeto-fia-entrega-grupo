@@ -1,0 +1,55 @@
+name: creditguard-mlops
+
+services:
+  prediction-api:
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    container_name: creditguard-prediction-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../Model/artifacts:/workspace/Model/artifacts:ro
+    environment:
+      - MODEL_VERSION=v2
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: creditguard-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - prediction-api
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: creditguard-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  pipeline-orchestrator:
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    container_name: creditguard-pipeline-orchestrator
+    command: ["python", "MLOps/pipeline_orchestration.py"]
+    volumes:
+      - ..:/workspace
+    profiles:
+      - batch
